@@ -1,0 +1,391 @@
+---
+title: "Tutorial 3: ANOVA"
+author: "Ziling Ma"
+date: "October 30th, 2024"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+solution <- TRUE
+```
+
+
+## Introduction
+
+Analysis of variance (ANOVA), in its simplest form, is used to <span style="color:red">compare multiple means in a test for equivalence</span>.  In that sense, <span style="color:red">it’s a straightforward extension of the hypothesis test comparing two means</span>. It determines whether there are any statistically significant differences among the means of the groups. ANOVA is an extension of the t-test, which is used to compare means between two groups only.
+
+
+In ANOVA, the variation in the data is partitioned into two components: the variation between groups and the variation within groups. If the variation between groups is significantly larger than the variation within groups, it suggests that there are differences among the group means.
+
+### The Hypotheses
+
+The hypotheses in ANOVA are as follows:
+
+- Null Hypothesis ($H_0$): There are no significant differences among the group means.
+$$H_0\: :\: \mu_1 = \mu_2=\cdots = \mu_k$$
+- Alternative Hypothesis ($H_1$): At least one group mean is significantly different from the others.
+$$H_1 \: \mu_1,\mu_2,\cdots,\mu_k\: \text{are not all equal}$$ 
+In fact, <span style="color:blue">when $k=2$, the two-sample t-test is equivalent to ANOVA</span>; for that reason, <span style="color:blue">ANOVA is most frequently employed when $k > 2$</span>.
+
+### Assumptions
+
+ANOVA relies on the following assumptions:
+
+1. <span style="color:Brown">Independence:</span> The observations within each group are independent of each other.
+2. <span style="color:Brown">Normality:</span> The data within each group are normally distributed.
+3. <span style="color:Brown">Homogeneity of variances:</span> The variances within each group are equal.
+
+If the assumptions of equality of variances or normality are violated, it doesn’t necessarily mean your results will be completely worthless, but it will impact the overall effectiveness of detecting a true difference in the means.
+
+Alternative statistical tests or transformations of the data may be more appropriate.
+
+It’s also worth noting that you don’t need to have an equal number of observations in each group to perform the test (in which case it is referred to as unbalanced). However, having unbalanced groups does render the test more sensitive to potentially detrimental effects if your assumptions of equal- ity of variances and normality are not sound.
+
+### Types of ANOVA
+
+There are different types of ANOVA based on the experimental design and the number of factors involved:
+
+1.  <span style="color:blue">One-Way ANOVA:</span>  Compares means across one categorical independent variable (factor) with two or more levels (groups).
+
+ <span style="color:purple"> Example </span>
+ 
+Suppose you are testing whether different teaching methods (Method A, Method B, Method C) result in different student performance. The factor would be the teaching method, and the dependent variable would be student scores.
+ 
+<span style="color:pink"> Hypotheses: </span>
+
+Null Hypothesis ($H_0$): The means of all groups are equal (no difference).
+
+Alternative Hypothesis ($H_1$): At least one group mean is different from the others.
+
+2.  <span style="color:blue">Two-Way ANOVA:</span>  Compares means across two categorical independent variables (factors) simultaneously to examine their main effects and interaction effect.
+
+ <span style="color:purple"> Example </span>
+ 
+Suppose you want to test whether different teaching methods (Method A, Method B, Method C) and different study environments (Quiet, Noisy) affect student performance. The two factors are the teaching method and the study environment, and the dependent variable is student scores.
+
+
+<span style="color:purple"> Main Effects:  </span>
+
+1. The individual effect of each factor on the dependent variable (e.g., effect of teaching method, effect of study environment).
+
+2. Interaction Effect: Examines whether the effect of one factor depends on the level of the other factor (e.g., does the teaching method work differently in noisy and quiet environments?).
+
+<span style="color:pink"> Hypotheses: </span>
+
+1. Main effect for Factor A (e.g., teaching method):
+
+Null Hypothesis ($H_0$): There is no effect of Factor A (means are equal across levels of Factor A).
+
+Alternative Hypothesis ($H_1$): There is a significant effect of Factor A.
+
+2. Main effect for Factor B (e.g., study environment):
+
+Null Hypothesis ($H_0$): There is no effect of Factor B.
+
+Alternative Hypothesis ($H_1$): There is a significant effect of Factor B.
+
+3. Interaction effect between Factor A and Factor B:
+
+Null Hypothesis ($H_0$): There is no interaction between Factor A and Factor B.
+
+Alternative Hypothesis ($H_1$): There is a significant interaction effect.
+ 
+3.  <span style="color:blue">Repeated Measures ANOVA:</span>  Compares means across one categorical independent variable (factor) with repeated measurements over time or conditions on the same subjects.
+4.  <span style="color:blue">Mixed Effects ANOVA:</span>  Similar to repeated measures ANOVA, but includes both fixed and random effects in the model.
+5.  <span style="color:blue">MANOVA:</span>  Multivariate Analysis of Variance compares means across two or more dependent variables simultaneously.
+
+### Performing ANOVA in R
+
+In R, you can perform ANOVA using the `aov()` function for most types of ANOVA. Here's a general syntax:
+
+```
+result <- aov(response_variable ~ factor1 + factor2 + ..., data = your_data)
+summary(result)
+```
+
+- `response_variable` is the numerical variable you want to analyze.
+- `factor1`, `factor2`, etc., are the categorical independent variables (factors) you want to include in the analysis.
+- `your_data` is the name of your dataset.
+
+The `aov()` function performs the ANOVA analysis, and the `summary()` function provides the ANOVA table and other useful statistics.
+
+### Interpreting the Results
+
+The output of ANOVA includes several statistics, such as the F-value, $p$-value, and degrees of freedom. The key information to interpret is:
+
+-  <span style="color:blue">The F-value:</span>  Indicates the overall significance of the model. A larger F-value suggests stronger evidence against the null hypothesis.
+-  <span style="color:red">The $p$-value:</span>  Indicates the probability of obtaining the observed result by chance. If the $p$-value is below a chosen significance level (e.g., 0.05), the null hypothesis is rejected, and it can be concluded that there are significant differences among the group means.
+-  <span style="color:blue">Degrees of freedom (DF):</span>  Represent the number of independent pieces of information available in the data.
+
+## Examples
+
+### Example 1: One-Way ANOVA
+
+In this example, we will perform a one-way ANOVA to compare the heights of individuals from three different cities: A, B, and C.
+
+```{r}
+# Create a data frame with heights
+data <- data.frame(
+  City = rep(c("A", "B", "C"), each = 10),
+  Height = c(170, 175, 180, 165, 172, 168, 173, 169, 171, 175,
+             160, 165, 170, 155, 162, 158, 163, 159, 161, 165,
+             180, 185, 190, 175, 182, 178, 183, 179, 181, 185)
+)
+
+```
+
+ <span style="color:brown">Comments:</span> 
+
+
+
+
+### Example 2: Two-Way ANOVA
+
+In this example, we will perform a two-way ANOVA to analyze the effect of two factors, Treatment and Gender, on the response variable, Weight.
+
+```{r}
+# Create a data frame with weights
+data <- data.frame(
+  Treatment = rep(c("A", "B", "C", "D"), each = 25),
+  Gender = rep(c("Male", "Female"), times = 50),
+  Weight = c(70, 75, 80, 85, 90, 65, 70, 75, 80, 85,
+             60, 65, 70, 75, 80, 55, 60, 65, 70, 75,
+             75, 80, 85, 90, 95, 70, 75, 80, 85, 90,
+             65, 70, 75, 80, 85, 60, 65, 70, 75, 80,
+             80, 85, 90, 95, 100, 75, 80, 85, 90, 95,
+             70, 75, 80, 85, 90, 65, 70, 75, 80, 85,
+             85, 90, 95, 100, 105, 80, 85, 90, 95, 100,
+             75, 80, 85, 90, 95, 70, 75, 80, 85, 90,
+             90, 95, 100, 105, 110, 85, 90, 95, 100, 105,
+             80, 85, 90, 95, 100, 75, 80, 85, 90, 95)
+)
+
+```
+
+ <span style="color:brown">Comments:</span> 
+
+Treatment has a significant effect on the outcome ($p < 0.001$), meaning the different treatments likely lead to different results.
+
+Gender does not have a significant effect ($p = 0.565$).
+
+The interaction between Treatment and Gender is not significant ($p = 0.998$), suggesting that the effect of the treatment is not different for different genders.
+
+
+
+
+
+## Explanation: Hypotheses and Diagnostic Checking
+
+Let’s use the 'chickwts' data for the example—the weights of chicks based on $k = 6$ different feeds. You’re interested in comparing the mean weights according to feed type to see whether they’re all equal.
+
+a. In the first step, we load the'chickwts' data from the R library 'datasets'.
+
+```{r}
+data("chickwts")
+```
+b. Use 'table' to summarize the six sample sizes and use 'tapply' to get each group mean
+
+
+If you would like to produce side-by-side boxplots of the distributions of weights
+
+
+
+Because boxplots display the median, not the mean, the second line of code adds the feed-specific means by using the function `points()`.
+
+Inspecting the plot, it certainly looks as though there’s a difference in the mean weights. Is any apparent difference statistically significant, though? To find out, the ANOVA test for this example concerns the following hypotheses:
+
+$$H_0: \mu_{\text{casein}}=\mu_{\text{horsebean}}=\mu_{\text{linseed}}=\mu_{\text{meatmeal}}=\mu_{\text{soybean}}=\mu_{\text{sunflower}}$$
+$$H_1 : \text{The means are not all equal.}$$ 
+
+Assuming independence of the data, before implementing the test, you must first check that the other assumptions are valid. 
+
+<span style="color:red">To test for equality of variances, you can use Levene’s test. In R, you can use function `leveneTest()` in R library `car`.</span>
+
+The Null hypothesis $H_0$: The variances are equal across the groups.
+
+The Alternative hypothesis $H_1$: The variances are not equal across the groups.
+
+If the $p$-value from Levene’s test is small (usually below $0.05$), it suggests that the variances across the groups are significantly different, indicating heteroscedasticity.
+
+```{r}
+library(car)
+leveneTest(chickwts$weight~chickwts$feed)
+
+```
+
+The output shows the $F$-statistic, degrees of freedom, and the $p$-value $(\text{Pr}(>F))$.
+
+The $p$-value is 0.5896, which is greater than the common threshold of 0.05. This means you fail to reject the null hypothesis. In other words, the variances across the groups are not significantly different, indicating homogeneity of variance.
+
+Next, consider the assumption of normality of the raw observations. 
+
+<span style="color:red">To test normality, we perform a Shapiro-Wilk test. We can use the `shapiro.test()` function to test the residuals for normality.</span>
+
+Null Hypothesis $H_0$: The data is normally distributed.
+Alternative Hypothesis $H_1$: The data is not normally distributed.
+
+If the p-value is greater than the significance level (usually 0.05), we fail to reject the null hypothesis, indicating that the data is normally distributed. Conversely, if the p-value is less than the significance level, the data is not normally distributed.
+
+Since we need to test the normality using residuals, we perform the ANOVA and then extract the residuals 
+
+```{r}
+# Perform ANOVA
+anova_model <- aov(weight ~ feed, data = chickwts)
+summary(anova_model)
+```
+```{r}
+# Extract residuals
+residuals_anova <- residuals(anova_model)
+
+# Perform Shapiro-Wilk test for normality of residuals
+shapiro.test(residuals_anova)
+```
+
+Interpretation of the Shapiro-Wilk Test Result:
+
+W = 0.98616: This is the Shapiro-Wilk test statistic. It indicates how closely the distribution of residuals aligns with a normal distribution (closer to 1 means a better fit to normality).
+
+p-value = 0.6272: Since the p-value is greater than 0.05, you fail to reject the null hypothesis. This means that the residuals of your ANOVA model are not significantly different from a normal distribution, which satisfies the normality assumption required for ANOVA.
+
+Meanwhile, you can also consider to plot  `Q-Q plot` for residuals
+```{r}
+qqnorm(residuals_anova)
+qqline(residuals_anova, col = "red")
+```
+
+If the residuals are normally distributed, the points should fall approximately along the diagonal line (which is added using the `qqline()` function). From this Q-Q plot, the residuals of our model appear to be normally distributed, which supports the normality assumption of ANOVA.
+
+
+<span style="color:red">If ANOVA indicates significant differences among the group means, post hoc tests can be conducted to determine which specific groups differ from each other. Common post hoc tests include Tukey's Honestly Significant Difference (HSD), Bonferroni correction, and Dunnett's test. These post hoc tests adjust for multiple comparisons and provide pairwise comparisons between groups.</span>
+
+
+## Exercises
+
+
+### Exercise 1
+
+For this exercise we use the dataset `InsectSprays`, which is available in `R`. In this experiment, 6 different insecticides were used and the number of dead insects in each plot were counted. There were 12 replications for each treatment level (insecticide), for a total of 72 observations.
+
+#### Part 3
+
+1. Draw a boxplot for the results and add axes labels and a title. Add the points for each treatment level. Observe that there is overplotting. Add some noise in the horizontal direction to avoid this problem. Comment on what you observe.
+
+```{r, include=solution}
+attach(InsectSprays)
+ 
+```
+ 
+
+2. Do an analysis of variance and test whether the different insecticides have an effect. Use level $\alpha = 0.01$ for this test. What are your conclusions?
+
+
+
+
+3. What are the estimated values for the average values for the six treatments $\hat\mu + \hat\tau_i$, $i = 1, \dots, 6$? What are the estimated values for the effects $\hat\tau_i$, $i = 1,\dots, 6$?
+
+```{r, echo=FALSE, include=solution, results = 'asis'}
+cat("We use `model.tables` for this. The average values are")
+```
+
+```{r, echo=FALSE, include=solution, results = 'asis'}
+cat("and the effects are")
+```
+
+
+
+4. What is the estimated value for the variance and standard deviation of the experimental error $\sigma^2$?
+
+```{r, echo=FALSE, include=solution, results = 'asis'}
+cat("The estimated variance for the experiments error is found in the anova table as the MSE for residuals")
+```
+
+
+
+5. Make residual plots for checking assumptions. Do you think the usual assumptions for the model are reasonable in this experiment?
+
+
+
+6. Use Levene’s test for equal variances and Shapiro-Wilk for normality using this model and comment on your results.
+
+
+
+ 
+
+#### Part 4
+
+7. Consider an alternative model using the square root of the number of counts. Obtain the analysis of variance table and compare with the previous model.
+
+ 
+ 
+
+8. Draw the diagnostic plots for this model and comment.
+
+ 
+ 
+
+9. Again, use Levene’s tests and Shapiro-Wilk and comment on your results.
+
+ 
+
+10. Which non-parametric test can be applied in this situation? What are the assumptions of the test? Do this test and compare with the results you obtained previously.
+
+ 
+### Exercise 2
+For this exercise we will use the data set `ToothGrowth`.
+
+#### Part 5
+
+1. Explore the data in `ToothGrowth`.
+```{r, include=solution}
+str(ToothGrowth)
+head(ToothGrowth)
+psych::describe(ToothGrowth)
+```
+
+2. `dose` is a numerical variable and we would like it to be categorical. Transform it to a factor. Make sure to preserve the order.
+ 
+
+
+3. Do a boxplot with the following command and comment on the result.
+```
+boxplot(len ~ supp * dose, data=ToothGrowth)
+```
+ 
+
+4. Use `interaction.plot()` to explore possible interactions between the factors. Comment.
+
+``` 
+interaction.plot(x.factor=dose, trace.factor=supp,
+                 response=len, fun=mean, type='b')
+```
+
+ 
+
+5. Use `lm()` to build and analyze a two-way model.
+
+ 
+
+
+#### Part 6
+
+6. Use `aov()` to build and analyze a two-way model.
+ 
+
+
+
+7. Plot the diagnostics graphs and comment on the results.
+ 
+
+8. Use `TukeyHSD()` with the option `which = c('dose')`. Comment.
+ 
+ 
+
+9. Fit a model without interactions using lm and compare with the complete model using anova. What is your conclusion?
+ 
+
+10. Fit a model only with interactions and compare with the full model. What is your conclusion?
+ 

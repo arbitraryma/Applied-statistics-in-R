@@ -1,0 +1,237 @@
+---
+title: "Tutotial 2 Basic plotting and ggplot2"
+author: "Ziling Ma"
+date: "Sep 15th, 2024"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# BASIC PLOTTING
+One particularly popular feature of R is its incredibly flexible plotting tools for
+data and model visualization. This is what draws many to R in the first place. Mastering
+R’s graphical functionality does require practice, but the fundamental concepts are straightforward. 
+
+## Using plot
+The easiest way to think about generating plots in R is to treat your screen as a blank, two-dimensional canvas. You can plot points and lines using x- and y-coordinates. 
+
+For this section, we will use the two vectors foo and bar as follows.
+```{r}
+foo <- c(1.1,2,3.5,3.9,4.2)
+bar <- c(2,2.2,-1.3,0,0.2)
+```
+
+a. Let's first try to plot (x,y) using the function plot().
+```{r}
+
+```
+
+## Graphical parameters
+<span style="color:blue"> Automatic Plot Types</span>
+
+By default, the plot function will plot individual points.
+
+a. Now, if we would like to show lines connecting each coordinate, how to do that?
+
+```{r}
+
+```
+
+<span style="color:blue"> Title and Axis Labels </span>
+
+By default, a basic plot won’t have a main title, and its axes will be labeled with the names of the vectors being plotted.
+But a main title and more descriptive axis labels often make the plotted data easier to interpret. You can add these by supplying text as character strings to main for a title, xlab for the x-axis label, and ylab for the y-axis label.
+
+a. Please add set the title name as 'My lovely plot', x-axis label as "x axis label", y-axis label as "location y".
+
+```{r}
+
+```
+
+b. What can you do if you want to have two lines of the main title?  Please try to write the main title as 'My lovely plot title on two lines' where we put 'title on two lines' in the second row 
+
+```{r}
+
+```
+<span style="color:blue"> Color </span>
+
+Adding color to a graph is far from just an aesthetic consideration. Color can make data much clearer—for example by distinguishing factor levels or emphasizing important numeric limits.
+
+a. So, now, please adapt the code below and change the color to red.
+
+```{r}
+plot(foo,bar,type="b",main="My lovely plot",xlab="",ylab="")
+
+```
+
+<span style="color:blue"> Line and Point Appearances </span>
+
+To alter the appearance of the plotted points you would use pch, and to alter the lines you would use lty.
+
+The pch parameter controls the character used to plot individual data points. You can specify a single character to use for each point, or you can specify a value between 1 and 25 (inclusive).
+
+The lty parameter, which affects the type of line drawn, can take the values 1 through 6. For example, 
+
+```{r}
+plot(foo,bar,type="b",main="My lovely plot",xlab="",ylab="",
+        col=4,pch=8,lty=2,cex=2.3,lwd=3.3)
+```
+
+
+## Exercise 
+With the following data, create a plot of weight on the x-axis and height on the y-axis. Use different point characters or colors to distinguish between males and females and provide a matching legend. Label the axes and give the plot a title.
+
+```{r}
+weights <- c(55,85,75,42,93,63,58,75,89,67)
+height <- c(161, 185, 174, 154, 188, 178, 170, 167, 181, 178)
+sex <- c("female", "male", "male", "female", "male", "male", "female", "male", "male", "female")
+```
+Hint: To create a basic plot in R using the given data, you can use the plot() function, differentiating between males and females by using different point characters (pch) or colors.
+
+
+
+# Introduction to ggplot2
+
+`ggplot2` is a powerful data visualization library in R that provides a flexible and intuitive way to create high-quality graphics. It is based on the Grammar of Graphics, which allows you to build complex plots by combining simple components.
+
+In this tutorial, we'll cover the basic usage of `ggplot2` and explore various plotting functions and options.
+
+```{r}
+library(ggplot2)
+```
+
+## A quick plot with qplot
+qplot() is a function in the ggplot2 package in R. It stands for "quick plot" and is designed to provide a simpler, more concise way to create plots using the powerful ggplot2 system. It allows users to create common types of plots quickly without the need to write more complex ggplot code.
+
+a. We will again the foo and bar vectors. First, let us visualize the data use function 'qplot'.
+
+<span style="color:blue"> Setting Appearance Constants with Geoms </span>
+
+To add and customize points and lines in a ggplot2 graphic, you alter the object itself, rather than using a long list of arguments or secondary func- tions executed separately (such as points or lines). You can modify the object using ggplot2’s convenient suite of geometric modifiers, known as geoms.
+
+Now please try to follow the instructions as follows. 
+
+a. In the first call to qplot, you create an empty plot object by setting the initial geometric modifier as 'geom="blank"' (if you displayed this plot, you would just see the gray background and the axes).
+
+b. Then you layer on the two other geoms as geom_point() and geom_line(). As indicated by the parentheses, these geoms are functions that result in their own specialized objects. You can add geoms to the qplot object using the + operator. Please speicy the point to have size 3, shape 6, and color to be blue. The line to be red and with 'linetype' 2. 
+
+
+
+
+<span style="color:red"> For the following section, we will work on exercises using the powerful 'ggplot' function. We will explore different types of plots it can create and learn how to specify various elements when plotting.  </span>
+
+## Scatter Plot
+
+We will now start using 'ggplot' function with a simple scatter plot. We'll use the built-in `mtcars` dataset in the R package ggplot2 to plot the relationship between the horsepower and the miles per gallon (mpg) of cars. Can you try to do this first?
+
+```{r}
+# the dataset can be used through the following function
+data("mtcars")
+# if you want to see the detailed descrition of the dataset, you can use 
+?mtcars
+# to check the what is the dataset about and the meaning of each variable 
+```
+
+## Line Plot
+
+Next, let's create a line plot to visualize the trend of a variable over time. We'll use the built-in `economics` dataset to plot the relationship between the date and the unemployement rate.
+
+```{r}
+# hint, you can use +geom_line() here to specify that you want a line plot
+```
+
+
+
+## Bar Plot
+
+Bar plots are useful for comparing categorical variables. Let's create a bar plot to compare the average miles per gallon (mpg) of different car engines.
+
+```{r}
+# hint, you can use +geom_bar(stat = "identity")) here to specify that you want a line plot
+# In the geom_bar() function, the stat = "identity" argument tells ggplot to use the actual values provided in the dataset, instead of counting occurrences or performing other statistical transformations.
+```
+
+## Box Plot
+
+Box plots are commonly used to visualize the distribution of a variable across different groups. Let's create a box plot to compare the horsepower of cars by the number of cylinders.
+
+```{r}
+# hint, you can use +geom_boxplot() here to specify that you want a line plot
+```
+
+
+## Histogram
+
+Histograms are used to visualize the distribution of a continuous variable. Let's create a histogram to examine the distribution of car weights in the `mtcars` dataset.
+
+```{r}
+# hint, you can use + geom_histogram() here to specify that you want a line plot
+```
+
+## Scatter Plot with Regression Line
+
+We can add a regression line to a scatter plot to visualize the relationship between two variables. Let's create a scatter plot of car weights versus horsepower and add a regression line.
+
+```{r}
+# hint, you can use + geom_smooth() here to specify that you want a line plot
+# geom_smooth contains different methods, you can specify to use lm, glm, gam, loess 
+```
+
+## Customizing Plot Appearance
+
+`ggplot2` provides extensive options for customizing the appearance of plots. Let's create a scatter plot of car weights versus horsepower and customize the colors, labels, and axis limits.
+
+
+
+## Faceted Plots
+
+Faceting allows you to create multiple plots based on the levels of a categorical variable. Let's create a faceted scatter plot to compare the horsepower and miles per gallon (mpg) of cars for different car transmissions.
+
+
+
+## Adding Smoothed Lines
+
+We can add smoothed lines to scatter plots to visualize the trend between two variables. Let's create a scatter plot of car weights versus horsepower and add smoothed lines using different smoothing methods.
+
+
+
+## Layering Multiple Geometries
+
+`ggplot2` allows you to layer multiple geometries to create more complex plots. Let's create a scatter plot with points and error bars to visualize the mean and standard deviation of the horsepower for different number of forward gears.
+
+
+
+## Customizing Themes
+
+`ggplot2` provides various themes to customize the appearance of your plots. Let's create a scatter plot of car weights versus horsepower and apply a customized theme.
+
+
+
+
+## Customizing Legends
+
+Legends provide information about the mapping between data and aesthetics in a plot. Let's create a scatter plot of car weights versus horsepower and customize the legend title, labels, and position.
+
+
+
+## Proportional Symbol Map
+
+A proportional symbol map is used to represent spatial distributions by varying the size of symbols based on the values associated with the locations. Let's create a proportional symbol map of cities in the United States, where the size of the circles represents the population.
+
+
+
+## Bubble Map
+
+A bubble map is similar to a proportional symbol map but uses bubbles of different sizes to represent quantities associated with specific locations. Let's create a bubble map of countries based on their GDP.
+
+
+
+
+
+
+
